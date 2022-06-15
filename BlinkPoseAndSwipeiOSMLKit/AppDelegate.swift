@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  BlinkPoseAndSwipeiOSMLKit
 //
-//  Created by Anupam Chugh on 25/01/20.
+//  Created by Ockiya Beinmonyu Daniel on 30.03.22.
 //  Copyright © 2020 iowncode. All rights reserved.
 //
 

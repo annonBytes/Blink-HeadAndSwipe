@@ -2,8 +2,9 @@
 //  CameraView.swift
 //  BlinkPoseAndSwipeiOSMLKit
 //
-//  Created by Anupam Chugh on 25/01/20.
-//  Copyright © 2020 iowncode. All rights reserved.
+//  Created by Ockiya Daniel on.
+//  Copyright © 2022 Bytes. All rights reserved.
+//  Different Implementation of the Wink and Head Tracking
 //
 
 import UIKit
@@ -14,16 +15,22 @@ final class CameraView: UIView {
     
     private lazy var vision = Vision.vision()
     
+    
+    /// Delegate for winking
+    ///     - Parameters
+    ///        -blinkDelegate: Double
+    ///        -headDelegate: Int
+    
     var blinkDelegate : BlinkSwiperDelegate?
     var headDelegate : headSwiperDelegate?
     var restingFace = true
+    var restFace = true
     
     lazy var options : VisionFaceDetectorOptions = {
         let o = VisionFaceDetectorOptions()
         o.performanceMode = .accurate
         o.classificationMode = .all
         o.isTrackingEnabled = false
-//        o.performanceMode = .fast
         return o
     }()
     
@@ -197,34 +204,18 @@ extension CameraView: AVCaptureVideoDataOutputSampleBufferDelegate {
             }
             
             
-            if let face = features.first{
+            if let face = features.first {
                 
-                let leftEyeOpenProbability = face.leftEyeOpenProbability
-                let rightEyeOpenProbability = face.rightEyeOpenProbability
+             
                 let rightHeadMoveProbability = face.headEulerAngleZ
                 let leftHeadMoveProbability = face.headEulerAngleZ
                 
+//                Getting values of the Head and Eye features
 //                print("head euler X angle is \(face.headEulerAngleZ)")
 //                print("left eye movement is \(face.leftEyeOpenProbability)")
 //                print("right eye movement is \(face.rightEyeOpenProbability)")
-            
-                if leftEyeOpenProbability > 0.95 && rightEyeOpenProbability < 0.1
-                                {
-                                    if self.restingFace {
-                                        self.blinkDelegate?.rightBlink()
-                                        self.restingFace = false
-                                    }
-                                }
-                else if rightEyeOpenProbability > 0.95 && leftEyeOpenProbability < 0.1
-                                {
-                                    if self.restingFace {
-                                        self.restingFace = false
-                                        self.blinkDelegate?.leftBlink()
-                                    }
-                                }
-                
              
-                else if rightHeadMoveProbability < -25
+                 if rightHeadMoveProbability < -25
                 {
                     if self.restingFace{
                         self.restingFace = false
@@ -244,28 +235,41 @@ extension CameraView: AVCaptureVideoDataOutputSampleBufferDelegate {
                     self.restingFace = true
                 }
             }
+            
+            
+            if let faces = features.first{
+
+                let leftEyeOpenProbability = faces.leftEyeOpenProbability
+                let rightEyeOpenProbability = faces.rightEyeOpenProbability
+
+                 if leftEyeOpenProbability > 0.95 && rightEyeOpenProbability < 0.1
+                                {
+                                    if self.restFace {
+                                        self.restFace = false
+//                                        self.blinkDelegate?.rightBlink()
+                                        self.blinkDelegate?.leftBlink()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1)
+                                        {self.restFace = true}
+                                    }
+                                }
+        
+                else if rightEyeOpenProbability > 0.95 && leftEyeOpenProbability < 0.1
+                                {
+                                    if self.restFace {
+                                        self.restFace = false
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1)
+                                        {self.restFace = true}
+                                    }
+                            }
+                
+                else if rightEyeOpenProbability >=  leftEyeOpenProbability && leftEyeOpenProbability <= rightEyeOpenProbability {
+                    self.restFace = true
+                }
+                
+            }
+
         })
     }
         
     
 }
-
-//extension CameraView {
-//
-//    private func addObservers() {
-//        NotificationCenter.default.addObserver(self, selector: #selector(sessionChanges), name: Notification.Name("AVCaptureSessionRuntimeErrorNotification"), object: session)
-//    }
-//
-//    @objc func sessionChanges(_ notification: Notification){
-//        let session = AVCaptureSession()
-//        guard let changeValue = notification.userInfo?[AVCaptureSession] as?  NSData else { return }
-//
-//        let valueChanged = AVCaptureVideoDataOutput()
-//
-//        if valueChanged == .KeyValueObservingPublisher {
-//            sessionQueue.async
-//        }
-//    }
-//}
-
-
