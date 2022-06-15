@@ -1,7 +1,7 @@
 Page-Turning with Facial Gestures
 ===================
 
-![Cocoapods Compatible](https://user-images.githubusercontent.com/20721628/173729933-5525a95f-a2e2-40ad-b234-96009b24ace5.svg)
+![Cocoapods Compatible](https://img.shields.io/cocoapods/v/FaceTrigger.svg)
 
 
 # Introduction
